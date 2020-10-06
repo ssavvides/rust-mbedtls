@@ -28,6 +28,7 @@ byteorder = "1.0.0"
 yasna = { version = "0.2", optional = true }
 block-modes = { version = "0.3", optional = true }
 rc2 = { version = "0.3", optional = true }
+tokio = { version = "0.2", optional = true }
 
 [target.x86_64-fortanix-unknown-sgx.dependencies]
 rs-libc = "0.1.0"
@@ -80,6 +81,11 @@ required-features = ["std"]
 name = "server"
 path = "examples/server.rs"
 required-features = ["std"]
+
+[[test]]
+name = "async_session"
+path = "tests/async_session.rs"
+required-features = ["std", "threading", "tokio", "tokio/net", "tokio/io-util", "tokio/macros"]
 
 [[test]]
 name = "client_server"
