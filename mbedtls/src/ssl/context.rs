@@ -319,6 +319,19 @@ impl<'a> Session<'a> {
             flags => Err(VerifyError::from_bits_truncate(flags)),
         }
     }
+
+    #[cfg(feature = "std")]
+    pub fn get_alpn_protocol(&self) -> Result<Option<&'a str>> {
+        unsafe {
+            let ptr = ssl_get_alpn_protocol(self.inner);
+            if ptr.is_null() {
+                Ok(None)
+            } else {
+                let s = std::ffi::CStr::from_ptr(ptr).to_str()?;
+                Ok(Some(s))
+            }
+        }
+    }
 }
 
 impl<'a> Read for Session<'a> {

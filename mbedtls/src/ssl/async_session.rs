@@ -372,4 +372,8 @@ impl<'a> AsyncSession<'a> {
     pub fn verify_result(&self) -> io::Result<Result<(), VerifyError>> {
         self.session().map(|session| session.verify_result())
     }
+
+    pub fn get_alpn_protocol(&self) -> io::Result<Result<Option<&'a str>, Error>> {
+        self.session().map(|session| session.get_alpn_protocol())
+    }
 }

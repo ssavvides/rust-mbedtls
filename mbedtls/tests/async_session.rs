@@ -123,6 +123,7 @@ async fn server(
         }
     };
 
+    assert_eq!(session.get_alpn_protocol().unwrap().unwrap(), None);
     let ciphersuite = session.ciphersuite().unwrap();
     session
         .write_all(format!("Server2Client {:4x}", ciphersuite).as_bytes())

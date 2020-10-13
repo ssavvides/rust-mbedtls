@@ -83,6 +83,11 @@ path = "examples/server.rs"
 required-features = ["std"]
 
 [[test]]
+name = "alpn"
+path = "tests/alpn.rs"
+required-features = ["std"]
+
+[[test]]
 name = "async_session"
 path = "tests/async_session.rs"
 required-features = ["std", "threading", "tokio", "tokio/net", "tokio/io-util", "tokio/macros"]
