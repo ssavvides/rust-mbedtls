@@ -18,6 +18,12 @@ define!(
     impl<'a> Into<ptr> {}
 );
 
+impl Into<*mut mbedtls_sys::dhm_context> for &Dhm {
+    fn into(self) -> *mut mbedtls_sys::dhm_context {
+        &self.inner as *const _ as *mut _
+    }
+}
+
 impl Dhm {
     /// Takes both DER and PEM forms of FFDH parameters in `DHParams` format.
     ///

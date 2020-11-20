@@ -58,6 +58,11 @@ pub unsafe fn disable() {
     log_f = None;
 }
 
+//
+// NOTE: The following functions if used in a multithreaded or async environment will fail.
+//       Self test functions rely on global variables to track operations and anything non-self-test related will stomp over variables.
+//       While using these, make sure no other code uses mbedtls. Multiple self test operations done asynchronously may also return failures.
+//
 pub use mbedtls_sys::{
     aes_self_test as aes, arc4_self_test as arc4, base64_self_test as base64,
     camellia_self_test as camellia, ccm_self_test as ccm, ctr_drbg_self_test as ctr_drbg,
