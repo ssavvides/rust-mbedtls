@@ -179,7 +179,6 @@ where
 #[cfg(unix)]
 mod test {
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
-    use tokio::net::TcpStream;
 
     #[tokio::test]
     async fn client_server_test() {
@@ -222,8 +221,7 @@ mod test {
                 continue;
             }
 
-            let (c, s) = crate::support::net::create_tcp_pair().unwrap();
-            let (c, s) = (TcpStream::from_std(c).unwrap(), TcpStream::from_std(s).unwrap());
+            let (c, s) = crate::support::net::create_tcp_pair_async().unwrap();
             let c = tokio::spawn(super::client(c, min_c, max_c, exp_ver.clone()));
             let s = tokio::spawn(super::server(s, min_s, max_s, exp_ver));
 
@@ -234,8 +232,7 @@ mod test {
 
     #[tokio::test]
     async fn shutdown1() {
-        let (c, s) = crate::support::net::create_tcp_pair().unwrap();
-        let (c, s) = (TcpStream::from_std(c).unwrap(), TcpStream::from_std(s).unwrap());
+        let (c, s) = crate::support::net::create_tcp_pair_async().unwrap();
 
         let c = tokio::spawn(super::with_client(c, |session| Box::pin(async move {
             session.shutdown().await.unwrap();
@@ -255,8 +252,7 @@ mod test {
 
     #[tokio::test]
     async fn shutdown2() {
-        let (c, s) = crate::support::net::create_tcp_pair().unwrap();
-        let (c, s) = (TcpStream::from_std(c).unwrap(), TcpStream::from_std(s).unwrap());
+        let (c, s) = crate::support::net::create_tcp_pair_async().unwrap();
 
         let c = tokio::spawn(super::with_client(c, |session| Box::pin(async move {
             let mut buf = [0u8; 5];
@@ -279,8 +275,7 @@ mod test {
 
     #[tokio::test]
     async fn shutdown3() {
-        let (c, s) = crate::support::net::create_tcp_pair().unwrap();
-        let (c, s) = (TcpStream::from_std(c).unwrap(), TcpStream::from_std(s).unwrap());
+        let (c, s) = crate::support::net::create_tcp_pair_async().unwrap();
 
         let c = tokio::spawn(super::with_client(c, |session| Box::pin(async move {
             session.shutdown().await

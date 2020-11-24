@@ -12,14 +12,14 @@ use std::cell::Cell;
 use std::future::Future;
 use std::io::{self, Read, Write};
 use std::marker::Unpin;
-use std::mem::{self, MaybeUninit};
+use std::mem;
 use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
 use std::ptr::null_mut;
 use std::rc::Rc;
 use std::task::{Context as TaskContext, Poll};
 
-use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
 use crate::ssl::{Context, HandshakeError, MidHandshake, Session, Version};
 use crate::x509::VerifyError;
@@ -81,7 +81,9 @@ impl<S: Unpin> IoAdapter<S> {
 
 impl<S: AsyncRead + Unpin> Read for IoAdapter<S> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        self.with_context(|ctx, stream| stream.poll_read(ctx, buf))
+        let mut buf = ReadBuf::new(buf);
+        self.with_context(|ctx, stream| stream.poll_read(ctx, &mut buf))?;
+        Ok(buf.filled().len())
     }
 }
 
@@ -211,16 +213,16 @@ impl Drop for AsyncSession<'_> {
 }
 
 impl AsyncRead for AsyncSession<'_> {
-    unsafe fn prepare_uninitialized_buffer(&self, _: &mut [MaybeUninit<u8>]) -> bool {
-        false
-    }
-
     fn poll_read(
         mut self: Pin<&mut Self>,
         cx: &mut TaskContext<'_>,
-        buf: &mut [u8],
-    ) -> Poll<io::Result<usize>> {
-        self.with_context(cx, |s| s.read(buf))
+        buf: &mut ReadBuf<'_>,
+    ) -> Poll<io::Result<()>> {
+        self.with_context(cx, |s| {
+            let n = s.read(buf.initialize_unfilled())?;
+            buf.advance(n);
+            Ok(())
+        })
     }
 }
 
